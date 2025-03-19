@@ -1,0 +1,36 @@
+{
+  "name": "bible-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently \"bun run dev:client\" \"bun run dev:server\"",
+    "dev:client": "cd client && bun run dev",
+    "dev:server": "cd server && bun run dev",
+    "build": "bun run build:client && bun run build:server",
+    "build:client": "cd client && bun run build",
+    "build:server": "cd server && bun run build",
+    "preview": "concurrently \"bun run preview:client\" \"bun run preview:server\"",
+    "preview:client": "cd client && bun run preview",
+    "preview:server": "cd server && bun run preview"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "concurrently": "^8.2.2",
+    "mastra": "^0.4.2",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "dependencies": {
+    "@mastra/core": "^0.6.3",
+    "@tailwindcss/vite": "^4.0.14",
+    "tailwindcss": "^4.0.14",
+    "zod": "^3.24.2"
+  }
+}
