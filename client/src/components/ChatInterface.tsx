@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useChat, Message } from "../hooks/useChat";
+import { WeatherCard } from "./WeatherCard";
+import { CalendarEventCard } from "./CalendarEventCard";
 
 export function ChatInterface() {
   const { messages, isLoading, error, sendMessage, clearMessages } = useChat();
@@ -90,6 +92,22 @@ export function ChatInterface() {
 function ChatMessage({ message }: { message: Message }) {
   const isUser = message.role === "user";
 
+  // Check for tool calls
+  const hasWeatherToolCall =
+    message.toolCall?.toolName === "weatherTool" && message.toolCall?.toolData;
+
+  // Check for calendar tool calls
+  const hasCalendarToolCall =
+    message.toolCall?.toolName &&
+    [
+      "listCalendarsTool",
+      "listEventsTool",
+      "createEventTool",
+      "updateEventTool",
+      "deleteEventTool",
+    ].includes(message.toolCall.toolName) &&
+    message.toolCall?.toolData;
+
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
       <div
@@ -99,6 +117,25 @@ function ChatMessage({ message }: { message: Message }) {
             : "bg-white border rounded-tl-none"
         }`}
       >
+        {/* If we have a weather tool call, show the WeatherCard */}
+        {hasWeatherToolCall && message.toolCall && (
+          <div className="mb-3">
+            <WeatherCard weatherData={message.toolCall.toolData} />
+          </div>
+        )}
+
+        {/* If we have a calendar tool call, show the CalendarEventCard */}
+        {hasCalendarToolCall &&
+          message.toolCall &&
+          message.toolCall.toolName === "listEventsTool" && (
+            <div className="mb-3">
+              <CalendarEventCard
+                events={message.toolCall.toolData}
+                title="Calendar Events"
+              />
+            </div>
+          )}
+
         <div className="text-sm">
           {message.content.split("\n").map((line, i) => (
             <p key={i}>{line || <br />}</p>

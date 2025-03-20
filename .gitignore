@@ -45,4 +45,8 @@ lerna-debug.log*
 coverage
 
 # Bun specific
-bun.lockb 
+bun.lockb
+
+# GCP tokens
+.gcp-saved-tokens.json
+gcp-oauth.keys.json

@@ -6,6 +6,10 @@ export interface Message {
   content: string;
   role: "user" | "assistant";
   timestamp: Date;
+  toolCall?: {
+    toolName: string;
+    toolData: any;
+  };
 }
 
 interface UseChatOptions {
@@ -31,12 +35,16 @@ export function useChat({ initialMessages = [] }: UseChatOptions = {}) {
   };
 
   // Function to add an assistant message to the chat
-  const addAssistantMessage = (content: string) => {
+  const addAssistantMessage = (
+    content: string,
+    toolCall?: { toolName: string; toolData: any }
+  ) => {
     const assistantMessage: Message = {
       id: Date.now().toString(),
       content,
       role: "assistant",
       timestamp: new Date(),
+      toolCall,
     };
 
     setMessages((prevMessages) => [...prevMessages, assistantMessage]);
@@ -80,7 +88,40 @@ export function useChat({ initialMessages = [] }: UseChatOptions = {}) {
       }
 
       const data = await response.json();
-      addAssistantMessage(data.text);
+
+      // Check if the response includes tool call info
+      let toolCall = undefined;
+
+      // Parse the response to detect tool calls from the steps array
+      if (
+        data.steps &&
+        data.steps.length > 0 &&
+        data.steps[0].toolResults &&
+        data.steps[0].toolResults.length > 0
+      ) {
+        const latestToolResult =
+          data.steps[0].toolResults[data.steps[0].toolResults.length - 1];
+
+        // Extract tool name and result
+        const toolName = latestToolResult.toolName;
+        const toolData = latestToolResult.result;
+
+        toolCall = {
+          toolName,
+          toolData,
+        };
+      }
+
+      // Also check for toolResults at the root level (from our middleware)
+      if (!toolCall && data.toolResults && data.toolResults.length > 0) {
+        const latestToolResult = data.toolResults[data.toolResults.length - 1];
+        toolCall = {
+          toolName: latestToolResult.toolName,
+          toolData: latestToolResult.result,
+        };
+      }
+
+      addAssistantMessage(data.text, toolCall);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An unknown error occurred"

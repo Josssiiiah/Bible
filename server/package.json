@@ -7,17 +7,23 @@
     "dev": "mastra dev",
     "build": "tsc",
     "start": "tsx src/index.ts",
-    "preview": "tsc && node dist/index.js"
+    "preview": "tsc && node dist/index.js",
+    "auth": "tsx src/auth.ts"
   },
   "dependencies": {
-    "@ai-sdk/openai": "latest",
+    "@ai-sdk/openai": "1.2.6",
     "@mastra/core": "latest",
+    "express": "^4.21.2",
+    "google-auth-library": "^9.15.1",
+    "googleapis": "^146.0.0",
     "mastra": "latest",
+    "open": "^10.1.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/express": "^5.0.1",
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
-    "tsx": "^4.7.0"
+    "tsx": "^4.7.0",
+    "typescript": "^5.0.0"
   }
 }
